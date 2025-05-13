@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Submit Topic</title>
+  <style>
+    table{
+      border-collapse: collapse;
+      width: 100%;
+      padding: 10px 20px;
+    }
+    th, td{
+      border: 1px solid black;
+      padding: 5px 10px;
+      font-family: Arial, sans-serif;
+      color: #E9D8A6;
+      text-align: center;
+      table-layout: fixed;
+    }
+    th{
+      background-color: #001219;
+    }
+    td.odd{
+      background-color: #005F73;
+    }
+    td.even{
+      background-color: #0A9396;
+    }
+    .redHeading{
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <h1 id="state">Submit Your Topic</h1>
+  <form id="topicForm">
+    <label>Roll Number: <input type="text" id="roll" required></label><br>
+    <label>Topic (max 50 words):<br>
+      <textarea id="topic" rows="4" cols="40" required></textarea>
+    </label><br>
+    <button type="submit">Submit</button>
+  </form>
+
+  <h2>All Submissions</h2>
+  <ul id="submissionsList"></ul>
+  <table>
+    <tr>
+      <th>ROLLNUMBER</th>
+      <th>TITLE</th>
+    </tr>
+    <tr><td colspan=2 style="text-align: center;">Nothing....</td></tr>
+  </table>
+  
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,128 @@
+/*
+Project Structure:
+- public/
+  - index.html
+  - script.js
+- server.js
+- submissions.json (auto-generated)
+*/
+
+// -------------------------- public/index.html --------------------------
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Submit Topic</title>
+</head>
+<body>
+  <h1>Submit Your Topic</h1>
+  <form id="topicForm">
+    <label>Roll Number: <input type="text" id="roll" required></label><br>
+    <label>Topic (max 50 words):<br>
+      <textarea id="topic" rows="4" cols="40" required></textarea>
+    </label><br>
+    <button type="submit">Submit</button>
+  </form>
+
+  <h2>All Submissions</h2>
+  <ul id="submissionsList"></ul>
+
+  <script src="script.js"></script>
+</body>
+</html>
+
+// -------------------------- public/script.js --------------------------
+
+document.addEventListener('DOMContentLoaded', () => {
+  if (document.cookie.indexOf("submitted=true") !== -1) {
+    document.getElementById('topicForm').style.display = 'none';
+    document.getElementById('submissionsList').innerHTML = '<li>You have already submitted.</li>';
+  }
+
+  document.getElementById('topicForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const roll = document.getElementById('roll').value.trim();
+    const topic = document.getElementById('topic').value.trim();
+    const wordCount = topic.split(/\s+/).filter(w => w).length;
+    if (wordCount > 50) {
+      alert("Topic must be under 50 words.");
+      return;
+    }
+    fetch('/submit', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({roll, topic})
+    })
+    .then(res => res.json())
+    .then(data => {
+      document.cookie = "submitted=true; expires=Fri, 31 Dec 9999 23:59:59 GMT; SameSite=Lax";
+      document.getElementById('topicForm').style.display = 'none';
+      displaySubmissions(data.submissions);
+    })
+    .catch(err => console.error("Submit error:", err));
+  });
+
+  fetch('/submissions')
+    .then(res => res.json())
+    .then(data => {
+      if (data.submissions) displaySubmissions(data.submissions);
+    });
+
+  function displaySubmissions(list) {
+    const ul = document.getElementById('submissionsList');
+    ul.innerHTML = '';
+    list.forEach(sub => {
+      const li = document.createElement('li');
+      li.textContent = sub.roll + ": " + sub.topic;
+      ul.appendChild(li);
+    });
+  }
+});
+
+// -------------------------- server.js --------------------------
+
+const express = require('express');
+const fs = require('fs');
+const path = require('path');
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.use(express.json());
+app.use(express.static('public'));
+
+app.post('/submit', (req, res) => {
+  const { roll, topic } = req.body;
+  if (!roll || !topic) {
+    return res.status(400).json({error: "Missing fields" });
+  }
+  const wordCount = topic.trim().split(/\s+/).filter(w => w).length;
+  if (wordCount > 50) {
+    return res.status(400).json({error: "Topic too long" });
+  }
+  let submissions = [];
+  try {
+    if (fs.existsSync('submissions.json')) {
+      submissions = JSON.parse(fs.readFileSync('submissions.json', 'utf8'));
+    }
+  } catch (e) {
+    submissions = [];
+  }
+  submissions.push({ roll, topic });
+  fs.writeFileSync('submissions.json', JSON.stringify(submissions, null, 2), 'utf8');
+  res.json({ submissions });
+});
+
+app.get('/submissions', (req, res) => {
+  let submissions = [];
+  try {
+    if (fs.existsSync('submissions.json')) {
+      submissions = JSON.parse(fs.readFileSync('submissions.json', 'utf8'));
+    }
+  } catch (e) {
+    submissions = [];
+  }
+  res.json({ submissions });
+});
+
+app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));

@@ -1,3 +1,4 @@
+// outer js
 document.addEventListener('DOMContentLoaded', () => {
   if (document.cookie.indexOf("submitted=true") !== -1) changeState();
 

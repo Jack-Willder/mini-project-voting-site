@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const table = document.getElementsByTagName('table')[0]
     console.log(table)
     // ul.innerHTML = '';
-    table.innerHTML = '<tr><th>ROLLNUMBER</th><th>TITLE</th></tr>'
+    table.innerHTML = '<tr><th style="width: 20%;">ROLLNUMBER</th><th>TITLE</th></tr>'
     list.forEach(sub => {
       const tr = document.createElement('tr');
       const td1 = document.createElement('td');

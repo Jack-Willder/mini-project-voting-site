@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
       alert("Topic must be under 50 words.");
       return;
     }
-    fetch('/submit', {
+    fetch('http://16.16.95.66:3000/submit', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({roll, topic})
@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
     .catch(err => console.error("Submit error:", err));
   });
 
-  fetch('/submissions')
+  fetch('http://16.16.95.66:3000/submissions')
     .then(res => res.json())
     .then(data => {
       if (data.submissions) displaySubmissions(data.submissions);
